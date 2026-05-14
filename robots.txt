@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://lkdesignandbuild.com.au/sitemap.xml
