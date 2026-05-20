@@ -57,6 +57,18 @@ This repo serves directly from GitHub Pages on the `main` branch (root). Push to
 The canonical source is the [primedesign](https://github.com/cjmuldoon/portfolio) repo at `/assets/branding/final/`.
 Copy refreshed SVGs and PNGs from there into `assets/branding/final/` here when the brand kit changes.
 
+## Contact form
+
+The contact form (`#contact` section of `index.html`) runs on **[Web3Forms](https://web3forms.com)** — GitHub Pages is static, so there's no backend; Web3Forms receives the submission and emails it on.
+
+- The form POSTs to `https://api.web3forms.com/submit` via `fetch()` (see `handleSubmit()` in `index.html`).
+- Auth is the hidden `access_key` input — a public key, fine to sit in the HTML.
+- A `botcheck` honeypot input + the domain lock (`lkdesignandbuild.com.au`, set when the form was created) handle spam.
+
+**To change where enquiries are delivered:** it's *not* in this repo — log in at [web3forms.com](https://web3forms.com) (account: cjmuldoon@gmail.com), open the form → **Settings** → recipient / "Send Email To" field. Set it to `lyda@lkdesignandbuild.com.au`. A new recipient address may need a one-time verification click.
+
+To swap the form to a different Web3Forms key entirely, replace the `access_key` value in `index.html`.
+
 ## Adding project photography
 
 Drop project images into `assets/images/projects/` (create as needed), then reference them in `index.html`.
