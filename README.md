@@ -2,8 +2,10 @@
 
 Production website for **LK Design and Build** — Adelaide premium home renovations, additions and custom builds.
 
-- **Live now:** https://cjmuldoon.github.io/lk/ (GitHub Pages default URL)
-- **Target domain:** `lkdesignandbuild.com.au` — registered with **Crazy Domains**, not yet wired up. See [Custom domain](#custom-domain) below.
+- **Live:** http://lkdesignandbuild.com.au/ — apex domain is wired up and serving.
+- **HTTPS:** provisioning automatically; enable *Enforce HTTPS* in Settings → Pages once the certificate is issued.
+- **`www`:** not yet working — still on a Crazy Domains parking record. See [Custom domain](#custom-domain) to finish it.
+- Default GitHub URL (always works): https://cjmuldoon.github.io/lk/
 
 ## Structure
 
