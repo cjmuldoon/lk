@@ -796,7 +796,19 @@
         </div>
         <!-- Contact form -->
         <div class="fade-in-right">
+          <!-- ───────────────────────────────────────────────────────────────
+               CONTACT FORM — powered by Web3Forms (https://web3forms.com)
+               TO GO LIVE: generate an access key at web3forms.com using
+               lyda@lkdesignandbuild.com.au, then replace YOUR_ACCESS_KEY below.
+               That single change makes every enquiry email straight to Lyda.
+               ─────────────────────────────────────────────────────────────── -->
           <form id="contact-form" class="space-y-8" onsubmit="handleSubmit(event)">
+            <input type="hidden" hidden name="access_key" value="YOUR_ACCESS_KEY">
+            <input type="hidden" hidden name="subject" value="New enquiry — lkdesignandbuild.com.au">
+            <input type="hidden" hidden name="from_name" value="LK Design and Build website">
+            <!-- Honeypot: invisible to people; a bot that ticks it is auto-rejected by Web3Forms. -->
+            <input type="checkbox" name="botcheck" hidden tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none;">
+
             <div class="grid sm:grid-cols-2 gap-8">
               <div>
                 <label class="text-cream/40 text-xs font-sans tracking-wide-custom uppercase block mb-2">Name</label>
@@ -826,9 +838,12 @@
               <label class="text-cream/40 text-xs font-sans tracking-wide-custom uppercase block mb-2">Message</label>
               <textarea name="message" rows="4" class="form-input form-input-dark" placeholder="Tell us about your project..."></textarea>
             </div>
-            <button type="submit" class="btn-primary-filled w-full sm:w-auto">Send Enquiry</button>
+            <button type="submit" id="form-submit" class="btn-primary-filled w-full sm:w-auto">Send Enquiry</button>
             <div id="form-success" class="hidden mt-4">
               <p class="text-gold font-sans text-sm">Thank you for your enquiry. We'll be in touch within 24 hours.</p>
+            </div>
+            <div id="form-error" class="hidden mt-4">
+              <p class="font-sans text-sm" style="color:#E5998A;">Sorry — your enquiry couldn't be sent just now. Please email <a href="mailto:lyda@lkdesignandbuild.com.au" style="color:#C9A96E;">lyda@lkdesignandbuild.com.au</a> directly.</p>
             </div>
           </form>
         </div>
@@ -965,19 +980,50 @@
     document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right').forEach(el => observer.observe(el));
 
     // ── Form handling ──
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
       e.preventDefault();
       const form = e.target;
       const successMsg = document.getElementById('form-success');
-      // In production, this would send data to a backend
+      const errorMsg = document.getElementById('form-error');
+      const submitBtn = document.getElementById('form-submit');
+      successMsg.classList.add('hidden');
+      errorMsg.classList.add('hidden');
+
+      // Staging guard: until the real Web3Forms key is in place, fail
+      // visibly rather than faking a success the client never receives.
+      if (form.elements['access_key'].value === 'YOUR_ACCESS_KEY') {
+        errorMsg.classList.remove('hidden');
+        console.warn('Contact form: Web3Forms access key not set — replace YOUR_ACCESS_KEY in index.html.');
+        return;
+      }
+
+      const originalLabel = submitBtn.textContent;
+      submitBtn.textContent = 'Sending…';
       form.style.opacity = '0.5';
       form.style.pointerEvents = 'none';
-      setTimeout(() => {
-        successMsg.classList.remove('hidden');
-        form.reset();
+
+      try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(Object.fromEntries(new FormData(form)))
+        });
+        const result = await response.json();
+        if (response.ok && result.success) {
+          successMsg.classList.remove('hidden');
+          form.reset();
+        } else {
+          errorMsg.classList.remove('hidden');
+          console.error('Web3Forms error:', result);
+        }
+      } catch (err) {
+        errorMsg.classList.remove('hidden');
+        console.error('Web3Forms request failed:', err);
+      } finally {
+        submitBtn.textContent = originalLabel;
         form.style.opacity = '1';
         form.style.pointerEvents = 'auto';
-      }, 800);
+      }
     }
 
     // ── Smooth scroll for anchor links ──
